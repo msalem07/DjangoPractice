@@ -6,7 +6,7 @@ from .models import Question, Choice
 from django.views import generic
 #shorcut to loader.get_template
 from django.shortcuts import render
-
+from django.utils import timezone
 # Create your views here.
 #Initial Templates, these are being replaced with the bottom ones 
 # def index(request):
@@ -41,18 +41,21 @@ from django.shortcuts import render
 class IndexView(generic.ListView):
 
     #The context attribute for listView returned becomes the models name in lowercase plus list, in this case question_list. 
-    template_name = 'polls/index.html
+    template_name = 'polls/index.html'
     #Override that name and use custom one.'
     context_object_name = 'latest_question_list'
 
     def get_queryset(self):
-        return Question.objects.order_by('-pub_date')[:5]
+        return Question.objects.filter(pub_date__lte=timezone.now()).order_by('-pub_date')[:5]
 
 class DetailView(generic.DetailView):
     #The context attribute returned becomes the models name in lowercase, in this case question.
     #Argument on url needs to now refer to pk instead of question_id
     model = Question
     template_name = 'polls/details.html'
+
+    def get_queryset(self):
+        return Question.objects.filter(pub_date__lte=timezone.now())
 
 class ResultsView(generic.DetailView):
     model = Question
